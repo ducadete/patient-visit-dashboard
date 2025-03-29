@@ -19,6 +19,7 @@ interface DateInputProps {
   label: string;
   placeholder?: string;
   disableFuture?: boolean;
+  disablePast?: boolean;
 }
 
 const DateInput = ({
@@ -27,6 +28,7 @@ const DateInput = ({
   label,
   placeholder = "DD/MM/AAAA",
   disableFuture = false,
+  disablePast = false,
 }: DateInputProps) => {
   const [inputValue, setInputValue] = useState<string>(
     value ? format(value, "dd/MM/yyyy") : ""
@@ -61,6 +63,22 @@ const DateInput = ({
     }
   };
 
+  // Created disabled date function that handles both past and future constraints
+  const getDisabledDays = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (disableFuture && date > today) {
+      return true;
+    }
+    
+    if (disablePast && date < today) {
+      return true;
+    }
+    
+    return false;
+  };
+
   return (
     <div className="flex">
       <Input
@@ -86,7 +104,7 @@ const DateInput = ({
             onSelect={handleCalendarSelect}
             initialFocus
             className="pointer-events-auto"
-            disabled={disableFuture ? (date) => date > new Date() : undefined}
+            disabled={getDisabledDays}
             locale={ptBR}
           />
         </PopoverContent>

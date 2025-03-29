@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Settings } from "lucide-react";
+import { Settings, Database } from "lucide-react";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -21,6 +21,10 @@ const Layout = ({ children, title }: LayoutProps) => {
           <h1 className="text-2xl font-bold">Gestão de Visitas Médicas</h1>
           
           <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-2">
+              <Database size={16} className="text-green-300" />
+              <span className="text-xs text-green-300">Supabase Conectado</span>
+            </div>
             <span className="hidden md:inline-block">Olá, {user?.username}</span>
             <Button variant="outline" onClick={logout} className="text-black border-white hover:bg-medical-primary hover:text-white">
               Sair
