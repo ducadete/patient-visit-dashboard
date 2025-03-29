@@ -2,6 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { Settings } from "lucide-react";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -9,7 +10,7 @@ type LayoutProps = {
 };
 
 const Layout = ({ children, title }: LayoutProps) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
 
   return (
@@ -42,6 +43,13 @@ const Layout = ({ children, title }: LayoutProps) => {
             className={`px-4 py-2 rounded-md transition-colors ${location.pathname === '/visits' ? 'bg-white text-medical-primary font-medium' : 'hover:bg-white/10'}`}
           >
             Visitas Realizadas
+          </Link>
+          <Link 
+            to="/system" 
+            className={`px-4 py-2 rounded-md transition-colors ${location.pathname === '/system' ? 'bg-white text-medical-primary font-medium' : 'hover:bg-white/10'}`}
+          >
+            <Settings className="inline-block mr-1 h-4 w-4" />
+            Sistema
           </Link>
         </div>
       </nav>

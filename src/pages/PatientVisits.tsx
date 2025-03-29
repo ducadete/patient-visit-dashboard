@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, UserCircle } from "lucide-react";
 import { useVisits } from "@/contexts/VisitContext";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -99,8 +99,14 @@ const PatientVisits = () => {
           {sortedVisits.map((visit) => (
             <Card key={visit.id}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-medical-secondary">
-                  Visita em {format(visit.visitDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span className="text-medical-secondary">
+                    Visita em {format(visit.visitDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  </span>
+                  <div className="flex items-center text-sm font-normal text-gray-600">
+                    <UserCircle className="mr-1 h-4 w-4" />
+                    {visit.professionalName}
+                  </div>
                 </CardTitle>
               </CardHeader>
               

@@ -4,12 +4,20 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useVisits } from "@/contexts/VisitContext";
+import { useProfessionals } from "@/contexts/ProfessionalContext";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
@@ -19,13 +27,17 @@ import { cn } from "@/lib/utils";
 
 const VisitRegistration = () => {
   const { addVisit } = useVisits();
+  const { getActiveProfessionals } = useProfessionals();
   const [patientName, setPatientName] = useState("");
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   const [visitDate, setVisitDate] = useState<Date>(new Date());
+  const [professionalId, setProfessionalId] = useState("");
   const [subjective, setSubjective] = useState("");
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
   const [plan, setPlan] = useState("");
+  
+  const activeProfessionals = getActiveProfessionals();
   
   // Calculate age from birth date
   const calculateAge = (birthDate: Date | undefined): number => {
@@ -47,15 +59,21 @@ const VisitRegistration = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!patientName || !birthDate || !subjective || !objective || !assessment || !plan) {
+    if (!patientName || !birthDate || !professionalId || !subjective || !objective || !assessment || !plan) {
       return;
     }
+    
+    // Find professional name by id
+    const professional = activeProfessionals.find(p => p.id === professionalId);
+    if (!professional) return;
     
     addVisit({
       patientName,
       birthDate,
       age,
       visitDate,
+      professionalId,
+      professionalName: professional.name,
       subjective,
       objective,
       assessment,
@@ -66,6 +84,7 @@ const VisitRegistration = () => {
     setPatientName("");
     setBirthDate(undefined);
     setVisitDate(new Date());
+    setProfessionalId("");
     setSubjective("");
     setObjective("");
     setAssessment("");
@@ -136,37 +155,65 @@ const VisitRegistration = () => {
             </div>
           </div>
           
-          <div className="soap-field">
-            <Label htmlFor="visitDate" className="soap-label">Data da Visita</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full md:w-[240px] justify-start text-left font-normal",
-                    !visitDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {visitDate ? (
-                    format(visitDate, "dd/MM/yyyy", { locale: ptBR })
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="soap-field">
+              <Label htmlFor="visitDate" className="soap-label">Data da Visita</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !visitDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {visitDate ? (
+                      format(visitDate, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      <span>Selecione a data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={visitDate}
+                    onSelect={(date) => date && setVisitDate(date)}
+                    initialFocus
+                    className="pointer-events-auto"
+                    disabled={(date) => date > new Date()}
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="soap-field">
+              <Label htmlFor="professional" className="soap-label">Profissional</Label>
+              <Select 
+                value={professionalId} 
+                onValueChange={setProfessionalId}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o profissional" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeProfessionals.length === 0 ? (
+                    <SelectItem value="none" disabled>
+                      Nenhum profissional cadastrado
+                    </SelectItem>
                   ) : (
-                    <span>Selecione a data</span>
+                    activeProfessionals.map((professional) => (
+                      <SelectItem key={professional.id} value={professional.id}>
+                        {professional.name} ({professional.specialty})
+                      </SelectItem>
+                    ))
                   )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={visitDate}
-                  onSelect={(date) => date && setVisitDate(date)}
-                  initialFocus
-                  className="pointer-events-auto"
-                  disabled={(date) => date > new Date()}
-                  locale={ptBR}
-                />
-              </PopoverContent>
-            </Popover>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           <div className="soap-field">

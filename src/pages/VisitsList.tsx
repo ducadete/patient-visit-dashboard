@@ -3,7 +3,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
-import { CalendarIcon, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, Search, Trash2, User, Users } from "lucide-react";
 import { useVisits, Visit } from "@/contexts/VisitContext";
 import Layout from "@/components/Layout";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 const VisitsList = () => {
@@ -33,16 +39,20 @@ const VisitsList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [searchBy, setSearchBy] = useState<"patient" | "professional">("patient");
   
-  // Filter the visits based on search term and date filter
+  // Filter the visits based on search term, search type, and date filter
   const filteredVisits = visits.filter((visit) => {
-    const matchesSearch = visit.patientName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearchTerm = searchBy === "patient" 
+      ? visit.patientName.toLowerCase().includes(searchTerm.toLowerCase())
+      : visit.professionalName.toLowerCase().includes(searchTerm.toLowerCase());
+      
     const matchesDate = !dateFilter || 
       (visit.visitDate.getDate() === dateFilter.getDate() && 
        visit.visitDate.getMonth() === dateFilter.getMonth() && 
        visit.visitDate.getFullYear() === dateFilter.getFullYear());
     
-    return matchesSearch && matchesDate;
+    return matchesSearchTerm && matchesDate;
   });
   
   // Sort visits by date (most recent first)
@@ -61,52 +71,71 @@ const VisitsList = () => {
   
   return (
     <Layout title="Visitas Realizadas">
-      <div className="mb-6 flex flex-col md:flex-row items-start md:items-center gap-4">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-          <Input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por nome do paciente"
-            className="pl-10"
-          />
-        </div>
+      <div className="mb-6 space-y-4">
+        <Tabs 
+          value={searchBy} 
+          onValueChange={(value) => setSearchBy(value as "patient" | "professional")}
+          className="w-full md:w-[300px]"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="patient">
+              <User className="mr-2 h-4 w-4" />
+              Por Paciente
+            </TabsTrigger>
+            <TabsTrigger value="professional">
+              <Users className="mr-2 h-4 w-4" />
+              Por Profissional
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
         
-        <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !dateFilter && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateFilter ? (
-                  format(dateFilter, "dd/MM/yyyy", { locale: ptBR })
-                ) : (
-                  <span>Filtrar por data</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={dateFilter}
-                onSelect={setDateFilter}
-                initialFocus
-                className="pointer-events-auto"
-                locale={ptBR}
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={`Buscar por nome do ${searchBy === "patient" ? "paciente" : "profissional"}`}
+              className="pl-10"
+            />
+          </div>
           
-          {(searchTerm || dateFilter) && (
-            <Button variant="ghost" onClick={clearFilters}>
-              Limpar filtros
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[240px] justify-start text-left font-normal",
+                    !dateFilter && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateFilter ? (
+                    format(dateFilter, "dd/MM/yyyy", { locale: ptBR })
+                  ) : (
+                    <span>Filtrar por data</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dateFilter}
+                  onSelect={setDateFilter}
+                  initialFocus
+                  className="pointer-events-auto"
+                  locale={ptBR}
+                />
+              </PopoverContent>
+            </Popover>
+            
+            {(searchTerm || dateFilter) && (
+              <Button variant="ghost" onClick={clearFilters}>
+                Limpar filtros
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       
@@ -135,7 +164,10 @@ const VisitsList = () => {
                   <div className="text-sm text-gray-500">
                     Idade: {visit.age} anos
                   </div>
-                  <div className="mt-3 text-sm font-medium text-medical-secondary">
+                  <div className="mt-2 text-sm text-medical-primary">
+                    Profissional: {visit.professionalName}
+                  </div>
+                  <div className="mt-1 text-sm font-medium text-medical-secondary">
                     Data da visita: {format(visit.visitDate, "dd/MM/yyyy", { locale: ptBR })}
                   </div>
                 </div>

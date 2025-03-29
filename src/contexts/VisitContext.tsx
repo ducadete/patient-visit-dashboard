@@ -8,6 +8,8 @@ export type Visit = {
   birthDate: Date;
   age: number;
   visitDate: Date;
+  professionalId: string;
+  professionalName: string;
   subjective: string; // Motivo da consulta / Queixa / Entrevista
   objective: string; // Exames Físicos e Complementares
   assessment: string; // Avaliação / Problema / Hipótese
@@ -19,6 +21,7 @@ type VisitContextType = {
   addVisit: (visit: Omit<Visit, "id">) => void;
   deleteVisit: (id: string) => void;
   getVisitsByPatient: (patientName: string) => Visit[];
+  getVisitsByProfessional: (professionalId: string) => Visit[];
   getPatients: () => { name: string; birthDate: Date; visits: number }[];
 };
 
@@ -66,6 +69,12 @@ export const VisitProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       (visit) => visit.patientName.toLowerCase().includes(patientName.toLowerCase())
     );
   };
+  
+  const getVisitsByProfessional = (professionalId: string) => {
+    return visits.filter(
+      (visit) => visit.professionalId === professionalId
+    );
+  };
 
   const getPatients = () => {
     const patientsMap = new Map<string, { name: string; birthDate: Date; visits: number }>();
@@ -89,7 +98,14 @@ export const VisitProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   return (
     <VisitContext.Provider
-      value={{ visits, addVisit, deleteVisit, getVisitsByPatient, getPatients }}
+      value={{ 
+        visits, 
+        addVisit, 
+        deleteVisit, 
+        getVisitsByPatient, 
+        getVisitsByProfessional,
+        getPatients 
+      }}
     >
       {children}
     </VisitContext.Provider>

@@ -1,15 +1,18 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as Sonner } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { VisitProvider } from "./contexts/VisitContext";
+import { ProfessionalProvider } from "./contexts/ProfessionalContext";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import VisitRegistration from "./pages/VisitRegistration";
 import VisitsList from "./pages/VisitsList";
 import PatientVisits from "./pages/PatientVisits";
+import SystemManagement from "./pages/SystemManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,12 +24,23 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
+// Admin route component to protect admin-only routes
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isAdmin } = useAuth();
+  
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  
+  return <>{children}</>;
+};
+
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
   
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
       
       <Route path="/" element={
         <PrivateRoute>
@@ -46,6 +60,12 @@ const AppRoutes = () => {
         </PrivateRoute>
       } />
       
+      <Route path="/system" element={
+        <PrivateRoute>
+          <SystemManagement />
+        </PrivateRoute>
+      } />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -54,15 +74,17 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <VisitProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </VisitProvider>
+      <ProfessionalProvider>
+        <VisitProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </VisitProvider>
+      </ProfessionalProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
