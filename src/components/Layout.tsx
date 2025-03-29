@@ -22,7 +22,7 @@ const Layout = ({ children, title }: LayoutProps) => {
           
           <div className="flex items-center gap-4">
             <span className="hidden md:inline-block">Olá, {user?.username}</span>
-            <Button variant="outline" onClick={logout} className="text-white border-white hover:bg-medical-primary">
+            <Button variant="outline" onClick={logout} className="text-black border-white hover:bg-medical-primary hover:text-white">
               Sair
             </Button>
           </div>

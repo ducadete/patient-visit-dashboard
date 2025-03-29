@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +13,14 @@ export type Visit = {
   objective: string; // Exames Físicos e Complementares
   assessment: string; // Avaliação / Problema / Hipótese
   plan: string; // Plano / Intervenção / Procedimento
+  // Vital signs
+  temperature: string;
+  heartRate: string;
+  respiratoryRate: string;
+  bloodPressure: string;
+  oxygenSaturation: string;
+  weight: string;
+  bloodGlucose: string;
 };
 
 type VisitContextType = {

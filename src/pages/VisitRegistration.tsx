@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
+import DateInput from "@/components/DateInput";
+import VitalSigns from "@/components/VitalSigns";
 import {
   Select,
   SelectContent,
@@ -36,6 +38,15 @@ const VisitRegistration = () => {
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
   const [plan, setPlan] = useState("");
+  
+  // Vital signs state
+  const [temperature, setTemperature] = useState("");
+  const [heartRate, setHeartRate] = useState("");
+  const [respiratoryRate, setRespiratoryRate] = useState("");
+  const [bloodPressure, setBloodPressure] = useState("");
+  const [oxygenSaturation, setOxygenSaturation] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bloodGlucose, setBloodGlucose] = useState("");
   
   const activeProfessionals = getActiveProfessionals();
   
@@ -78,6 +89,14 @@ const VisitRegistration = () => {
       objective,
       assessment,
       plan,
+      // Add vital signs
+      temperature,
+      heartRate,
+      respiratoryRate,
+      bloodPressure,
+      oxygenSaturation,
+      weight,
+      bloodGlucose,
     });
     
     // Reset form
@@ -89,6 +108,13 @@ const VisitRegistration = () => {
     setObjective("");
     setAssessment("");
     setPlan("");
+    setTemperature("");
+    setHeartRate("");
+    setRespiratoryRate("");
+    setBloodPressure("");
+    setOxygenSaturation("");
+    setWeight("");
+    setBloodGlucose("");
   };
   
   return (
@@ -111,35 +137,13 @@ const VisitRegistration = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="soap-field">
                 <Label htmlFor="birthDate" className="soap-label">Data de Nascimento</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !birthDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {birthDate ? (
-                        format(birthDate, "dd/MM/yyyy", { locale: ptBR })
-                      ) : (
-                        <span>Selecione a data</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={birthDate}
-                      onSelect={setBirthDate}
-                      initialFocus
-                      className="pointer-events-auto"
-                      disabled={(date) => date > new Date()}
-                      locale={ptBR}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DateInput
+                  value={birthDate}
+                  onChange={setBirthDate}
+                  label="Data de Nascimento"
+                  placeholder="DD/MM/AAAA"
+                  disableFuture={true}
+                />
               </div>
               
               <div className="soap-field">
@@ -271,6 +275,24 @@ const VisitRegistration = () => {
               required
             />
           </div>
+          
+          {/* Vital Signs Section */}
+          <VitalSigns 
+            temperature={temperature}
+            setTemperature={setTemperature}
+            heartRate={heartRate}
+            setHeartRate={setHeartRate}
+            respiratoryRate={respiratoryRate}
+            setRespiratoryRate={setRespiratoryRate}
+            bloodPressure={bloodPressure}
+            setBloodPressure={setBloodPressure}
+            oxygenSaturation={oxygenSaturation}
+            setOxygenSaturation={setOxygenSaturation}
+            weight={weight}
+            setWeight={setWeight}
+            bloodGlucose={bloodGlucose}
+            setBloodGlucose={setBloodGlucose}
+          />
           
           <div className="flex justify-end">
             <Button type="submit" className="soap-button">
