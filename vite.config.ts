@@ -4,7 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  base: '/patient-visit-dashboard/', 
+  base: '/patient-visit-dashboard/',
+  build: {
+    outDir: 'docs',                 
+  },
   server: {
     host: "::",
     port: 8080,
