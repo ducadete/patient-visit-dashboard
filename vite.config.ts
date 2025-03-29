@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   base: '/patient-visit-dashboard/',  
   build: {
-    outDir: 'docs',                  
+    outDir: 'dist',                 
   },
   server: {
     host: "::",
