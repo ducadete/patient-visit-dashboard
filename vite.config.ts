@@ -5,9 +5,9 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  base: '/patient-visit-dashboard/',  // exatamente seu repositório GitHub
+  base: '/patient-visit-dashboard/',  
   build: {
-    outDir: 'docs',                   // pasta que GitHub Pages usa
+    outDir: 'docs',                  
   },
   server: {
     host: "::",
