@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,23 +19,20 @@ const queryClient = new QueryClient();
 // Private route component to protect routes
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
-  
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 // Admin route component to protect admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isAdmin } = useAuth();
-  
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (!isAdmin) return <Navigate to="/" replace />;
-  
   return <>{children}</>;
 };
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
-  
+
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
@@ -47,25 +43,28 @@ const AppRoutes = () => {
           <VisitRegistration />
         </PrivateRoute>
       } />
+
+      {/* ✅ Adicionada rota para corrigir erro 404 ao acessar GitHub Pages */}
+      <Route path="/patient-visit-dashboard" element={<Navigate to="/" replace />} />
       
       <Route path="/visits" element={
         <PrivateRoute>
           <VisitsList />
         </PrivateRoute>
       } />
-      
+
       <Route path="/patient/:patientName" element={
         <PrivateRoute>
           <PatientVisits />
         </PrivateRoute>
       } />
-      
+
       <Route path="/system" element={
         <PrivateRoute>
           <SystemManagement />
         </PrivateRoute>
       } />
-      
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -79,7 +78,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-              <AppRoutes />
+            <AppRoutes />
           </TooltipProvider>
         </VisitProvider>
       </ProfessionalProvider>
